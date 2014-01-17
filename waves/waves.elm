@@ -2,8 +2,9 @@ import Mouse
 import Window
 
 ballRadius   = 2
-periodLength = 200
+periodLength = 100
 amplitude    = 100
+velocity     = 0.1
 
 ball hue = circle ballRadius |> filled (hsv hue 0.9 0.9)
 
@@ -22,17 +23,19 @@ xPositions_ remaining itemWidth positions =
 
 -- Math stuff
 
-pahseAngle p x = pi * x / p
+phaseAngle p x = pi * x / p
 ypos a w       = (sin w) * a
+
+phaseAngleT p v t x = pi * (x - v * t) / p
 
 -- Main        
 
-scene (w,h) = 
+scene (w,h) time = 
   let (wf, hf)     = (toFloat w, toFloat h)
       topLeft      = ballRadius - (wf/2)
       xcoords      = xPositions wf (ballRadius * 2)
-      angles       = map (pahseAngle periodLength) xcoords
+      angles       = map (phaseAngleT periodLength velocity time) xcoords
       toBall (x,w) = ball w |> move (x, ypos amplitude w)
   in collage w h <| map toBall <| zip xcoords angles
 
-main = lift scene Window.dimensions
+main = lift2 scene Window.dimensions (foldp (+) 0 (fps 30))
