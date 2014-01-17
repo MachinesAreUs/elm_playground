@@ -26,19 +26,19 @@ xPositions_ remaining itemWidth positions =
 
 phaseAngle p x      = pi * x / p
 phaseAngleT p v t x = pi * (x - v * t) / p
-ypos minA maxA w' w x  = 
-  let transX   = x + (w/2)
-      delta = transX * (maxA - minA) / w
-  in (sin w') * (minA + delta)
+ypos minA maxA w windowWidth x  = 
+  let transX   = x + (windowWidth/2)
+      delta = transX * (maxA - minA) / windowWidth
+  in (sin w) * (minA + delta)
 
--- Main        
+-- Main
 
-scene (w,h) time = 
-  let (wf, hf)     = (toFloat w, toFloat h)
-      topLeft      = ballRadius - (wf/2)
-      xcoords      = xPositions wf (ballRadius * 2)
-      angles       = map (phaseAngleT periodLength velocity time) xcoords
-      toBall (x,w') = ball w' |> move (x, ypos minAmp maxAmp w' (toFloat w) x)
-  in collage w h <| map toBall <| zip xcoords angles
+scene (wWidth,wHeight) time = 
+  let (wf, hf)      = (toFloat wWidth, toFloat wHeight)
+      topLeft       = ballRadius - (wf/2)
+      xcoords       = xPositions wf (ballRadius * 2)
+      angles        = map (phaseAngleT periodLength velocity time) xcoords
+      toBall (x,w') = ball w' |> move (x, ypos minAmp maxAmp w' wf x)
+  in collage wWidth wHeight <| map toBall <| zip xcoords angles
 
 main = lift2 scene Window.dimensions <| foldp (+) 0 (fps 30)
