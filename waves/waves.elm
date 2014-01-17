@@ -4,10 +4,10 @@ import Window
 ballRadius   = 2
 periodLength = 100
 maxAmp       = 200
-minAmp       = 50
+minAmp       = 20
 velocity     = 0.1
 
-ball hue = circle ballRadius |> filled (hsv hue 0.9 0.9)
+ball hue = circle ballRadius |> filled (hsv hue 1 1)
 
 -- X points
 
@@ -26,18 +26,22 @@ xPositions_ remaining itemWidth positions =
 
 phaseAngle p x      = pi * x / p
 phaseAngleT p v t x = pi * (x - v * t) / p
-ypos minA maxA w windowWidth x  = 
-  let transX = x + (windowWidth / 2)
-      delta  = transX * (maxA - minA) / windowWidth
+ypos minA maxA w winWidth x = 
+  let transX = x + (winWidth / 2)
+      delta  = transX * (maxA - minA) / winWidth
   in (sin w) * (minA + delta)
 
 -- Main
 
 scene (wWidth, wHeight) time = 
-  let (wf, hf)      = (toFloat wWidth, toFloat wHeight)
-      xcoords       = xPositions wf (ballRadius * 2)
-      angles        = map (phaseAngleT periodLength velocity time) xcoords
-      toBall (x,w') = ball w' |> move (x, ypos minAmp maxAmp w' wf x)
-  in collage wWidth wHeight <| map toBall <| zip xcoords angles
+  let (wf, hf)        = (toFloat wWidth, toFloat wHeight)
+      xcoords         = xPositions wf (ballRadius * 2)
+      angles          = map (phaseAngleT periodLength velocity time) xcoords
+      relYPos w' wf x = ypos minAmp maxAmp w' wf x
+      toBall (x, w')  = ball w' |> move (x, relYPos w' wf x)
+      dephase x' f    = moveX x' f
+      basicWave       = map toBall <| zip xcoords angles
+      dephasedWave    = basicWave |> map (dephase -periodLength)
+  in collage wWidth wHeight <| basicWave ++ dephasedWave
 
 main = lift2 scene Window.dimensions <| foldp (+) 0 (fps 30)
