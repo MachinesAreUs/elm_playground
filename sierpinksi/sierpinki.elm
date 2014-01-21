@@ -1,24 +1,28 @@
 import Window
 import Graphics.Collage 
+import Graphics.Element
 
-side = 500
 rec  = 8
 
 middle (x,y) (x',y') = ((x + x') / 2, (y + y') / 2)
 
-set n idx t = 
-  let whiteTriangle [p1, p2, p3] = [middle p1 p2, middle p2 p3, middle p1 p3]
-      subTriangles [p1, p2, p3]  = [
-          [p1, middle p1 p2, middle p1 p3],
-          [middle p1 p2, p2, middle p2 p3],
-          [middle p1 p3, middle p2 p3, p3]
-        ]
-  in if | idx < n  -> whiteTriangle t :: (concat (map (set n (idx + 1)) (subTriangles t))) 
+set n idx [p1,p2,p3] = 
+  let [a,b,c]      = [middle p1 p2, middle p2 p3, middle p1 p3]
+      subTriangles = [
+        [p1, a, c],
+        [a, p2, b],
+        [c, b, p3]
+      ]
+  in if | idx < n   -> [a,b,c] :: (concat (map (set n (idx + 1)) subTriangles)) 
         | otherwise -> []
 
 sarpinksi (w,h) = 
-  let mainTriangle = [(0,0),(side * cos (pi/3), side * sin (pi/3)),(side,0)]
-  in collage w h <|
-    (mainTriangle |> filled black) :: (set rec 0 mainTriangle |> map (filled white))
+  let side         = 0.8 * min (toFloat w) (toFloat h)
+      mainTriangle = [(0,0),(side * cos (pi / 3), side * sin (pi / 3)),(side,0)]
+      center f     = move (-side/2, tan (pi / 6) * -side / 2) f
+  in collage w h 
+       <| map center
+       <| (mainTriangle |> filled blue) :: 
+          (set rec 0 mainTriangle |> map (filled white))
 
 main = lift sarpinksi Window.dimensions
