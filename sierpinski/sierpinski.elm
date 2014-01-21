@@ -2,7 +2,7 @@ import Window
 import Graphics.Collage 
 import Graphics.Element
 
-rec  = 8
+iterations = 8
 
 middle (x,y) (x',y') = ((x + x') / 2, (y + y') / 2)
 
@@ -23,6 +23,6 @@ sarpinksi (w,h) =
   in collage w h 
        <| map center
        <| (mainTriangle |> filled blue) :: 
-          (set rec 0 mainTriangle |> map (filled white))
+          (set iterations 0 mainTriangle |> map (filled white))
 
 main = lift sarpinksi Window.dimensions
