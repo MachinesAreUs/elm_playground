@@ -1,6 +1,5 @@
 import Window
 import Graphics.Collage 
-import Graphics.Element
 
 iterations = 8
 
@@ -16,7 +15,7 @@ set n idx [p1,p2,p3] =
   in if | idx < n   -> [a,b,c] :: (concat (map (set n (idx + 1)) subTriangles)) 
         | otherwise -> []
 
-sarpinksi (w,h) = 
+sierpinski (w,h) = 
   let side         = 0.8 * min (toFloat w) (toFloat h)
       mainTriangle = [(0,0),(side * cos (pi / 3), side * sin (pi / 3)),(side,0)]
       center f     = move (-side/2, tan (pi / 6) * -side / 2) f
@@ -25,4 +24,4 @@ sarpinksi (w,h) =
        <| (mainTriangle |> filled blue) :: 
           (set iterations 0 mainTriangle |> map (filled white))
 
-main = lift sarpinksi Window.dimensions
+main = lift sierpinski Window.dimensions
