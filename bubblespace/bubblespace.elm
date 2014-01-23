@@ -33,15 +33,13 @@ bubble r color =
     circle r             |> filled color |> alpha bubbleAlpha
   ] 
 
-
 scene {ttime, delta, rands, dim} =
   let (w,h)                = dim
       toBubble             = bubble radius
       colors               = [red, orange, yellow, green, blue, purple]
       unpositionedBubbles  = map toBubble colors
       indexedBubbles       = zip unpositionedBubbles [0..10]
-      --bubbles              = map (\(f,idx) -> scatter (w,h) idx rands f) indexedBubbles
-      bubbles              = map fst indexedBubbles
+      bubbles              = map (\(f,idx) -> scatter (w,h) idx rands f) indexedBubbles
   in collage w h 
     bubbles
     |> color black
@@ -58,16 +56,3 @@ input =
                               ~ Window.dimensions
 
 main = lift scene input
-
-{-scatter : (Int,Int) -> Int -> [Int] -> Form -> Form
-scatter (w,h) idx rands f =
-  let randsf  = map toFloat rands
-      (wf,hf) = (toFloat w, toFloat h)
-      [a,b]   = drop (idx * 2) randsf |> take 2 
-      pos     = (a * wf / 200, b * hf / 200)
-  in move pos f
-
-main = collage 400 400 [
-    circle 30 |> filled blue |> scatter (400,400) 0 [50,-50,2,50,1,90]
-  ]
--}
