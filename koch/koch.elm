@@ -12,8 +12,7 @@ trisect (x,y) (x',y') =
   in ((x + dx, y + dy), (x + 2 * dx, y + 2 * dy))
 
 complete (x,y) (x',y') = 
-  let (x'',y'') = middle (x,y) (x',y')
-      side    = distance (x,y) (x',y')
+  let side    = distance (x,y) (x',y')
       theta   = (pi / 3) + atan2 (y'-y) (x'-x)
       (a2,b2) = (side * cos theta, side * sin theta)
   in (x + a2, y + b2)
