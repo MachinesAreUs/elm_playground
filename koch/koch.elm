@@ -39,8 +39,9 @@ koch (w,h) t =
                      , (side * cos (pi / 3) - dx, side * sin (pi / 3) - dy)
                      , (dx, -dy)
                      ]
-  in collage w h <| map style
+  in color black <| collage w h 
+                 <| map style
                  <| koch_set iterations 0 mainTriangle
 
 main = koch <~ Window.dimensions
-             ~ foldp (+) 0 (fps 1)
+             ~ foldp (+) 0 (fps 0.2)
