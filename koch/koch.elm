@@ -13,13 +13,10 @@ trisect (x,y) (x',y') =
 
 complete (x,y) (x',y') = 
   let (x'',y'') = middle (x,y) (x',y')
-      side      = distance (x,y) (x',y')
-      height    = tan (pi/3) * side / 2
-      theta     = (pi/2) + atan2 (y'-y) (x'-x)
-      (a1,b1)   = (x,y)
-      (a2,b2)   = (x''-x,y''-y)
-      (a3,b3)   = (height * cos theta, height * sin theta)
-  in (a1 + a2 + a3, b1 + b2 + b3)
+      side    = distance (x,y) (x',y')
+      theta   = (pi / 3) + atan2 (y'-y) (x'-x)
+      (a2,b2) = (side * cos theta, side * sin theta)
+  in (x + a2, y + b2)
 
 set n idx [p1, p2, p3] = 
   let (a1,a2)      = trisect p1 p2
@@ -32,9 +29,7 @@ set n idx [p1, p2, p3] =
                      , [a2, p2, b1]
                      , [b2, p3, c2]
                      ]
-      subSet l     = map (set n (idx + 1)) l |> concat
-  in if | idx == 0  -> [p1,p2,p3] :: subSet subTriangles
-        | idx < n   -> [p1,p2,p3] :: subSet subTriangles
+  in if | idx < n   -> [p1,p2,p3] :: concat (map (set n (idx + 1)) subTriangles)
         | otherwise -> []
 
 koch (w,h) t = 
