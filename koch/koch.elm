@@ -8,7 +8,7 @@ middle (x,y) (x',y') = ((x + x') / 2, (y + y') / 2)
 distance (x,y) (x',y') = sqrt <| (x' - x) ^ 2 + (y' - y) ^ 2
 
 trisect (x,y) (x',y') =
-  let (dx, dy)       = ((x' - x) / 3, (y' - y) / 3)
+  let (dx, dy) = ((x' - x) / 3, (y' - y) / 3)
   in ((x + dx, y + dy), (x + 2 * dx, y + 2 * dy))
 
 complete (x,y) (x',y') = 
@@ -17,7 +17,7 @@ complete (x,y) (x',y') =
       (a2,b2) = (side * cos theta, side * sin theta)
   in (x + a2, y + b2)
 
-set n idx [p1, p2, p3] = 
+koch_set n idx [p1, p2, p3] = 
   let (a1,a2)      = trisect p1 p2
       (b1,b2)      = trisect p2 p3
       (c1,c2)      = trisect p1 p3
@@ -28,18 +28,19 @@ set n idx [p1, p2, p3] =
                      , [a2, p2, b1]
                      , [b2, p3, c2]
                      ]
-  in if | idx < n   -> [p1,p2,p3] :: concat (map (set n (idx + 1)) subTriangles)
+  in if | idx < n   -> [p1,p2,p3] :: concat (map (koch_set n (idx + 1)) subTriangles)
         | otherwise -> []
 
 koch (w,h) t = 
   let style        = filled (hsv (t * pi / 2000 ) 0.9 0.9)
       side         = 0.8 * min (toFloat w) (toFloat h)
-      mainTriangle = [(0,0), (side * cos (pi / 3), side * sin (pi / 3)), (side,0)]
-      center f     = move (-side / 2, tan (pi / 6) * -side / 2) f
-  in collage w h
-       <| map center
-       <| (mainTriangle |> style) :: 
-          (set iterations 0 mainTriangle |> map style)
+      (dx,dy)      = (side / 2, tan (pi / 6) * side / 2)
+      mainTriangle = [ (-dx, -dy)
+                     , (side * cos (pi / 3) - dx, side * sin (pi / 3) - dy)
+                     , (dx, -dy)
+                     ]
+  in collage w h <| map style
+                 <| koch_set iterations 0 mainTriangle
 
 main = koch <~ Window.dimensions
-             ~ foldp (+) 0 (fps 10)
+             ~ foldp (+) 0 (fps 1)
