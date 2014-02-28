@@ -1,4 +1,5 @@
 import Window
+import Keyboard
 import Graphics.Collage 
  
 middle (x,y) (x',y') = ((x + x') / 2, (y + y') / 2)
@@ -22,7 +23,7 @@ koch_set n idx [p1,p5] =
                               <| [[p1,p2],[p2,p3],[p3,p4],[p4,p5]]
         | otherwise -> [[p1,p5]]
 
-koch (w,h) t = 
+koch (w,h) t theta = 
   let iterations = 6
       style      = traced <| solid (hsv (t * pi / 2000 ) 0.9 0.9) 
       side       = 0.8 * min (toFloat w) (toFloat h)
@@ -32,11 +33,16 @@ koch (w,h) t =
       p3         = (dx, -dy)
       initialSet = [[p1,p2],[p2,p3],[p3,p1]]
       unify      = map head 
-  in color black <| collage w h [ style <| unify
-                                        <| concat 
-                                        <| map (koch_set 6 0) 
-                                        <| initialSet 
-                                ]
+      curve      = style <| unify
+                         <| concat 
+                         <| map (koch_set 6 0) 
+                         <| initialSet 
+  in color black <| collage w h [ rotate theta curve ]
+
+time  = foldp (+) 0 (fps 2)
+angle = let toRads x = toFloat x
+        in lift toRads <| count Keyboard.space
 
 main = koch <~ Window.dimensions 
-             ~ foldp (+) 0 (fps 2)
+             ~ time
+             ~ angle
