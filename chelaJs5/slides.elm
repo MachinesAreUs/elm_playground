@@ -45,13 +45,13 @@ missing = [markdown|
 code = [markdown|
 # Dígaloooo cooon códigooooo!!!
 
-quicksort l = 
-  let h       = head l
-      xs      = tail l
-      lesser  = filter (\x -> x < h) xs
-      greater = filter (\x -> x >= h) xs
-  in if |(length l) == 0 -> []
-        |otherwise       -> (quicksort lesser) ++ [h] ++ (quicksort greater)
+    quicksort l = 
+      let h       = head l
+          xs      = tail l
+          lesser  = filter (\x -> x < h) xs
+          greater = filter (\x -> x >= h) xs
+      in if |(length l) == 0 -> []
+            |otherwise       -> (quicksort lesser) ++ [h] ++ (quicksort greater)
 |]
 
 pages = [ elm, fp, features, missing, code ]
@@ -65,14 +65,13 @@ navigation = collage 200 30
 
 sidebar = flow down [logo, navigation]
 
-scene n = flow right 
-  [ sidebar
-  , drop n pages |> head
-  ]
+scene n = flow right [ sidebar, drop n pages |> head]
 
 toPage k n = 
-  if | k.x == -1 && k.y == 0 -> max (n-1) 0
-     | k.x ==  1 && k.y == 0 -> min (n+1) (length pages - 1)
+  let new = k.x + n
+  in if | new <= 0  -> 0
+        | otherwise -> min new (length pages - 1)
+
 currPage = foldp toPage 0 Keyboard.arrows
 
 main = lift scene currPage
