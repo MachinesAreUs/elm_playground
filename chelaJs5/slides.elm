@@ -38,23 +38,40 @@ missing = [markdown|
 - Evaluación perezosa.
 - List comprehensions.
 - Sentencias 'where'.
-- Guardas
+- Guardas.
 - Notación 'do' o 'proc' para encapsular efectos colaterales.
 |]
 
 code = [markdown|
 # Dígaloooo cooon códigooooo!!!
 
-    quicksort l = 
-      let h       = head l
-          xs      = tail l
-          lesser  = filter (\x -> x < h) xs
-          greater = filter (\x -> x >= h) xs
-      in if |(length l) == 0 -> []
-            |otherwise       -> (quicksort lesser) ++ [h] ++ (quicksort greater)
+    quicksort xs = 
+      let lesser  h = filter (\x -> x < h) 
+          greater h = filter (\x -> x >= h)
+      in case xs of
+         []     -> []
+         hd::tl -> (quicksort (lesser hd tl)) ++ 
+                   [hd] ++ 
+                   (quicksort (greater hd tl))
 |]
 
-pages = [ elm, fp, features, missing, code ]
+welcome_md = [markdown|
+# Me caga JS !!!
+Gracias por acompañarnos! ^_^
+|]
+
+elems_and_layouts = 
+  let logo  = image 180 180 "./img/chelajs.png"
+      stack = flow down [welcome_md, logo]
+      composition = collage 250 250
+        [ ngon 7 100 |> filled yellow   
+        , circle 100 |> outlined (dashed red) 
+        , stack |> toForm |> rotate (degrees 30) |> scale 0.7
+        ]
+      title = [markdown|# Elements and Layouts|]
+  in flow down [title, composition]
+
+pages = [ elm, fp, features, missing, code, elems_and_layouts ]
 
 logo = image 200 200 "./img/elm.png"
 
@@ -67,10 +84,10 @@ sidebar = flow down [logo, navigation]
 
 scene n = flow right [ sidebar, drop n pages |> head]
 
-toPage k n = 
-  let new = k.x + n
-  in if | new <= 0  -> 0
-        | otherwise -> min new (length pages - 1)
+toPage arrows previousPage = 
+  let newPage = arrows.x + previousPage
+  in if | newPage <= 0  -> 0
+        | otherwise -> min newPage (length pages - 1)
 
 currPage = foldp toPage 0 Keyboard.arrows
 
