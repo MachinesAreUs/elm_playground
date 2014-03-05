@@ -71,11 +71,17 @@ elems_and_layouts =
       title = [markdown|# Elements and Layouts|]
   in flow down [title, composition]
 
-pages = [ elm, fp, features, missing, code, elems_and_layouts ]
+pages = [ elm
+        , fp
+        , features
+        , missing
+        , code
+        , elems_and_layouts
+        ]
 
-logo = image 200 200 "./img/elm.png"
+logo = image 160 160 "./img/elm.png"
 
-navigation = collage 200 30
+navigation = collage 160 30
   [ image 50 30 "./img/arrow_left.png"  |> toForm |> move (-40,0)
   , image 50 30 "./img/arrow_right.png" |> toForm |> move (40,0)
   ]
