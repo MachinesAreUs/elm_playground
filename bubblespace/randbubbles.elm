@@ -1,6 +1,12 @@
-import Window
-import Random
-import Text
+import Window exposing (..)
+import Random exposing (..)
+import Signal exposing (..)
+import Text exposing (..)
+import Time exposing (..)
+import List exposing (..)
+import Color exposing (..)
+import Graphics.Collage exposing (..)
+import Graphics.Collage exposing (..)
 
 radius      = 30
 lineWidth   = 3
@@ -11,7 +17,7 @@ bubbleAlpha = 0.4
 (!!) list idx = drop idx list |> head
 
 text = 
-  toForm . Text.text . (Text.color white) . toText . show 
+  Graphics.Collage.text << (Text.color white) << fromString << toString
 
 -- Program
 
@@ -29,20 +35,19 @@ scene {ttime, delta, rands, dim} =
       bubble radius (rands !! 0) yellow |> move ( 50, 50)
     , bubble radius (rands !! 1) blue   |> move ( 50,-50)
     , bubble radius (rands !! 2) green  |> move (-50,-50)
-    , bubble radius (rands !! 3) red    |> move (-50, 50)
-  ] |> color black
+    , bubble radius (rands !! 2) red    |> move (-50, 50)
+  ]-- |> color black
 
-type Input = { ttime: Time, delta: Time, rands: [Int], dim: (Int,Int) }
+type alias Input = { ttime: Time, delta: Time, rands: List Int, dim: (Int,Int) }
 
 input = 
   let source = fps 30
       ttime  = foldp (+) 0 source
-      rands  = combine <| map (\_ -> Random.range 0 100 source) [1..10] 
+      rands  = constant <| List.map (\_ -> generate (int 0 100) (initialSeed 123) |> fst) [1..10] 
   in sampleOn ttime <| Input <~ ttime
                               ~ (inSeconds <~ source)
                               ~ rands
                               ~ Window.dimensions
 
-main = lift scene input
-
+main = Signal.map scene input
 
