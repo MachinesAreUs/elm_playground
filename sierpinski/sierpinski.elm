@@ -1,5 +1,7 @@
-import Window
-import Graphics.Collage 
+import List exposing(..)
+import Graphics.Collage exposing(..)
+import Window exposing (..)
+import Color exposing (..)
 
 iterations = 8
 
@@ -24,4 +26,4 @@ sierpinski (w,h) =
        <| (mainTriangle |> filled blue) :: 
           (set iterations 0 mainTriangle |> map (filled white))
 
-main = lift sierpinski Window.dimensions
+main = Signal.map sierpinski Window.dimensions
