@@ -38,9 +38,9 @@ koch (w,h) t theta =
       p2         = (side * cos (pi / 3) - dx, side * sin (pi / 3) - dy)
       p3         = (dx, -dy)
       initialSet = [[p1,p2],[p2,p3],[p3,p1]]
-      heads      = (\x -> case head x of
-                          Just p -> p
-                          _      -> (0,0))
+      heads      = \x -> case head x of
+                         Just p -> p
+                         _      -> (0,0)
       curve      = style <| polygon
                          <| map heads
                          <| concat
