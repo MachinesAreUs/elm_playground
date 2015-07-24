@@ -1,7 +1,14 @@
-welcome = [markdown|
+import Graphics.Element exposing(..)
+import Graphics.Collage exposing(..)
+import Color exposing(..)
+import Signal exposing(..)
+import Time exposing(..)
+import Markdown
+
+welcome = Markdown.toElement """
 # Hola Chela JS !!!
 Gracias por acompañarnos! ^_^
-|]
+"""
 
 logo = image 200 200 "./img/chelajs.png"
 
@@ -14,6 +21,6 @@ composition w = collage 300 300
   ]
 
 time  = foldp (+) 0 (fps 20)
-theta = lift (\t -> pi * t / 5000) time
+theta = (\t -> pi * t / 5000) <~ time
 
-main = lift composition theta
+main = composition <~theta

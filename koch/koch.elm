@@ -1,5 +1,12 @@
 import Window
-import Graphics.Collage 
+import List exposing(..)
+import Graphics.Collage exposing(..)
+import Graphics.Element exposing(..)
+import Window exposing (..)
+import Color exposing (..)
+import Signal exposing (foldp, (~), (<~))
+import Time exposing (fps)
+import Keyboard
 
 iterations = 6
 
@@ -32,7 +39,7 @@ koch_set n idx [p1, p2, p3] =
         | otherwise -> []
 
 koch (w,h) t = 
-  let style        = filled (hsv (t * pi / 2000 ) 0.9 0.9)
+  let style        = filled (hsl (t * pi / 1000 ) 0.9 0.9)
       side         = 0.8 * min (toFloat w) (toFloat h)
       (dx,dy)      = (side / 2, tan (pi / 6) * side / 2)
       mainTriangle = [ (-dx, -dy)

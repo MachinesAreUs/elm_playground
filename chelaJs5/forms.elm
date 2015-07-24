@@ -1,7 +1,12 @@
-welcome = [markdown|
+import Graphics.Element exposing(..)
+import Graphics.Collage exposing(..)
+import Color exposing(..)
+import Markdown
+
+welcome = Markdown.toElement """
 # Hola Chela JS !!!
 Gracias por acompañarnos! ^_^
-|]
+"""
 
 logo = image 200 200 "./img/chelajs.png"
 

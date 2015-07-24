@@ -1,3 +1,4 @@
+import Signal exposing((<~))
 import Mouse
 
-main = lift asText Mouse.position
+main = show <~ Mouse.position

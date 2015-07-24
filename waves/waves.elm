@@ -1,19 +1,26 @@
+import List exposing(..)
+import Graphics.Collage exposing(..)
+import Graphics.Element exposing(..)
+import Window exposing (..)
+import Color exposing (..)
+import Signal exposing (foldp, (~), (<~))
+import Time exposing (fps)
+import Keyboard
 import Mouse
-import Window
 
-ballRadius   = 2
+ballRadius   = 4 
 periodLength = 100
-maxAmp       = 200
-minAmp       = 20
-velocity     = 0.1
+maxAmp       = 300
+minAmp       = 10
+velocity     = 1
 
-ball hue = circle ballRadius |> filled (hsv hue 1 1)
+ball hue = circle ballRadius |> filled (hsl hue 1 0.5)
 
 -- X points
 
 xPositions windowWidth itemSize = 
   let adjustCoords x = x - (windowWidth / 2)
-  in xPositions_ windowWidth (itemSize * 2) [] |> map adjustCoords
+  in xPositions_ windowWidth itemSize [] |> map adjustCoords
 
 xPositions_ remaining itemWidth positions = 
   let newPosition  = itemWidth * (length positions |> toFloat) + itemWidth
@@ -24,8 +31,8 @@ xPositions_ remaining itemWidth positions =
 
 -- Math stuff
 
-phaseAngle p x      = pi * x / p
-phaseAngleT p v t x = pi * (x - v * t) / p
+angle v t p x =  (x - v * t) / p
+
 ypos minA maxA w winWidth x = 
   let transX = x + (winWidth / 2)
       delta  = transX * (maxA - minA) / winWidth
@@ -34,14 +41,17 @@ ypos minA maxA w winWidth x =
 -- Main
 
 scene (wWidth, wHeight) time = 
-  let (wf, hf)        = (toFloat wWidth, toFloat wHeight)
-      xcoords         = xPositions wf (ballRadius * 2)
-      angles          = map (phaseAngleT periodLength velocity time) xcoords
-      relYPos w' wf x = ypos minAmp maxAmp w' wf x
-      toBall (x, w')  = ball w' |> move (x, relYPos w' wf x)
+  let (width, height) = (toFloat wWidth, toFloat wHeight)
+      xcoords         = xPositions width (ballRadius * 4)
+      angles          = map (angle velocity time periodLength) xcoords
+      relYPos w' x    = ypos minAmp maxAmp w' width x
+      toBall (x, w')  = ball w' |> move (x, relYPos w' x)
       dephase x' f    = moveX x' f
-      basicWave       = map toBall <| zip xcoords angles
+      basicWave       = map2 (,) xcoords angles |> map toBall
       dephasedWave    = basicWave |> map (dephase -periodLength)
-  in collage wWidth wHeight <| basicWave ++ dephasedWave
+      dephasedWave'   = basicWave |> map (dephase (-2*periodLength))
+  in collage wWidth wHeight <| basicWave ++ dephasedWave ++ dephasedWave' 
 
-main = lift2 scene Window.dimensions <| foldp (+) 0 (fps 30)
+main = let time = foldp (+) 0 (fps 30) 
+       in Signal.map2 scene Window.dimensions time
+
