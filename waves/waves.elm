@@ -32,7 +32,7 @@ xPositions_ remaining itemWidth positions =
 -- Math stuff
 
 angle v t p x =  (x - v * t) / p
- 
+
 ypos minA maxA w winWidth x = 
   let transX = x + (winWidth / 2)
       delta  = transX * (maxA - minA) / winWidth
@@ -47,8 +47,7 @@ scene (wWidth, wHeight) time =
       relYPos w' x    = ypos minAmp maxAmp w' width x
       toBall (x, w')  = ball w' |> move (x, relYPos w' x)
       dephase x' f    = moveX x' f
-      basicWave       = map toBall <| map2 (,) xcoords angles
-      basicWave'      = map2 (,) xcoords angles
+      basicWave       = map2 (,) xcoords angles |> map toBall
       dephasedWave    = basicWave |> map (dephase -periodLength)
       dephasedWave'   = basicWave |> map (dephase (-2*periodLength))
   in collage wWidth wHeight <| basicWave ++ dephasedWave ++ dephasedWave' 
