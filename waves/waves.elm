@@ -8,19 +8,19 @@ import Time exposing (fps)
 import Keyboard
 import Mouse
 
-ballRadius   = 50 
+ballRadius   = 4 
 periodLength = 100
-maxAmp       = 200
-minAmp       = 20
-velocity     = 0.1
+maxAmp       = 300
+minAmp       = 10
+velocity     = 1
 
-ball hue = circle ballRadius |> filled (hsl hue 1 1)
+ball hue = circle ballRadius |> filled (hsl hue 1 0.5)
 
 -- X points
 
 xPositions windowWidth itemSize = 
   let adjustCoords x = x - (windowWidth / 2)
-  in xPositions_ windowWidth (itemSize * 2) [] |> map adjustCoords
+  in xPositions_ windowWidth itemSize [] |> map adjustCoords
 
 xPositions_ remaining itemWidth positions = 
   let newPosition  = itemWidth * (length positions |> toFloat) + itemWidth
@@ -31,8 +31,8 @@ xPositions_ remaining itemWidth positions =
 
 -- Math stuff
 
-angle v t p x = pi * (x - v * t) / p 
-
+angle v t p x =  (x - v * t) / p
+ 
 ypos minA maxA w winWidth x = 
   let transX = x + (winWidth / 2)
       delta  = transX * (maxA - minA) / winWidth
@@ -42,7 +42,7 @@ ypos minA maxA w winWidth x =
 
 scene (wWidth, wHeight) time = 
   let (width, height) = (toFloat wWidth, toFloat wHeight)
-      xcoords         = xPositions width (ballRadius * 2)
+      xcoords         = xPositions width (ballRadius * 4)
       angles          = map (angle velocity time periodLength) xcoords
       relYPos w' x    = ypos minAmp maxAmp w' width x
       toBall (x, w')  = ball w' |> move (x, relYPos w' x)
@@ -50,8 +50,9 @@ scene (wWidth, wHeight) time =
       basicWave       = map toBall <| map2 (,) xcoords angles
       basicWave'      = map2 (,) xcoords angles
       dephasedWave    = basicWave |> map (dephase -periodLength)
-  --in collage wWidth wHeight <| basicWave -- ++ dephasedWave
-  in show <| basicWave' -- ++ dephasedWave
+      dephasedWave'   = basicWave |> map (dephase (-2*periodLength))
+  in collage wWidth wHeight <| basicWave ++ dephasedWave ++ dephasedWave' 
 
 main = let time = foldp (+) 0 (fps 30) 
        in Signal.map2 scene Window.dimensions time
+
