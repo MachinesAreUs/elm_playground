@@ -1,6 +1,12 @@
+import Signal exposing (foldp,(<~),(~))
+import Graphics.Collage exposing(..)
+import Graphics.Element exposing(..)
+import Color exposing(..)
+import List exposing(..)
 import Keyboard
+import Markdown
 
-elm = [markdown|
+elm = Markdown.toElement """
 # ¿Qué es Elm?
 - Lenguaje orientado a gráficas e interfaces.
 - Implementa el modelo de Programación Funcional Reactiva
@@ -8,9 +14,9 @@ elm = [markdown|
 - Implementado en Haskell
 - Compila a js + html
 - ¡Pura diversión! 
-|]
+"""
 
-fp = [markdown|
+fp = Markdown.toElement """
 # Programación Funcional
 - Funciones son elementos de primer nivel. Pueden:
     - Declararse "al vuelo".
@@ -22,43 +28,46 @@ fp = [markdown|
 - Se evita mantener estado mutable.
     - Cuando no es opción, se encapsula.
 - Programación declarativa.
-|]
+"""
 
-features = [markdown|
+features = Markdown.toElement """
 # Características del lenguaje.
 - Tipado estático e inferencia de tipos.
 - Todo son expresiones. (No instrucciones)
 - Las listas son muy importantes.
 - Pattern matching.
 - Las señales encapsulan secuencias de valores.
-|]
+"""
 
-missing = [markdown|
+missing = Markdown.toElement """
 # Cosas que no importa de Haskell
 - Evaluación perezosa.
 - List comprehensions.
 - Sentencias 'where'.
 - Guardas.
 - Notación 'do' o 'proc' para encapsular efectos colaterales.
-|]
+"""
 
-code = [markdown|
+code = Markdown.toElement """
 # Dígaloooo cooon códigooooo!!!
-
+```elm
     quicksort xs = 
-      let lesser  h = filter (\x -> x < h) 
-          greater h = filter (\x -> x >= h)
+      let lesser  h = filter (\\x -> x < h) 
+          greater h = filter (\\x -> x >= h)
       in case xs of
          []     -> []
          hd::tl -> (quicksort (lesser hd tl)) ++ 
                    [hd] ++ 
                    (quicksort (greater hd tl))
-|]
+```
+"""
 
-welcome_md = [markdown|
+title = Markdown.toElement "# Elements and Layouts"
+
+welcome_md = Markdown.toElement """
 # Me caga JS !!!
 Gracias por acompañarnos! ^_^
-|]
+"""
 
 elems_and_layouts = 
   let logo  = image 180 180 "./img/chelajs.png"
@@ -68,7 +77,6 @@ elems_and_layouts =
         , circle 100 |> outlined (dashed red) 
         , stack |> toForm |> rotate (degrees 30) |> scale 0.7
         ]
-      title = [markdown|# Elements and Layouts|]
   in flow down [title, composition]
 
 pages = [ elm
@@ -88,7 +96,11 @@ navigation = collage 160 30
 
 sidebar = flow down [logo, navigation]
 
-scene n = flow right [ sidebar, drop n pages |> head]
+heads x = case head x of
+          Just e -> e
+          _      -> show ""
+
+scene n = flow right [ sidebar, drop n pages |> heads]
 
 toPage arrows previousPage = 
   let newPage = arrows.x + previousPage
@@ -97,4 +109,4 @@ toPage arrows previousPage =
 
 currPage = foldp toPage 0 Keyboard.arrows
 
-main = lift scene currPage
+main = scene <~ currPage
