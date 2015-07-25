@@ -4,6 +4,8 @@ import Window exposing (..)
 import Color exposing (..)
 
 iterations = 8
+fgcolor    = blue
+bgcolor    = white
 
 middle (x,y) (x',y') = ((x + x') / 2, (y + y') / 2)
 
@@ -23,7 +25,7 @@ sierpinski (w,h) =
       center f     = move (-side / 2, tan (pi / 6) * -side / 2) f
   in collage w h 
        <| map center
-       <| (mainTriangle |> filled blue) :: 
-          (set iterations 0 mainTriangle |> map (filled white))
+       <| (mainTriangle |> filled fgcolor) :: 
+          (set iterations 0 mainTriangle |> map (filled bgcolor))
 
 main = Signal.map sierpinski Window.dimensions
